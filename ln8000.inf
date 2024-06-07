@@ -1,0 +1,62 @@
+;
+; ln8000.inf
+;
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = System ; TODO: specify appropriate Class
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Provider    = %ManufacturerName%
+CatalogFile = ln8000.cat
+DriverVer   = ; TODO: set DriverVer in stampinf property pages
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+ln8000.sys  = 1,,
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName% = Standard,NT$ARCH$.10.0...16299 ; %13% support introduced in build 16299
+
+[Standard.NT$ARCH$.10.0...16299]
+%ln8000.DeviceDesc% = ln8000_Device, Root\ln8000 ; TODO: edit hw-id
+
+[ln8000_Device.NT]
+CopyFiles = File_Copy
+
+[File_Copy]
+ln8000.sys
+
+;-------------- Service installation
+[ln8000_Device.NT.Services]
+AddService = ln8000,%SPSVCINST_ASSOCSERVICE%, ln8000_Service_Inst
+
+; -------------- ln8000 driver install sections
+[ln8000_Service_Inst]
+DisplayName    = %ln8000.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %13%\ln8000.sys
+
+[ln8000_Device.NT.Wdf]
+KmdfService = ln8000, ln8000_wdfsect
+
+[ln8000_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE = 0x00000002
+ManufacturerName = "<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+DiskName = "ln8000 Installation Disk"
+ln8000.DeviceDesc = "ln8000 Device"
+ln8000.SVCDESC = "ln8000 Service"
